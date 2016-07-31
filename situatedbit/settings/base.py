@@ -95,9 +95,6 @@ WSGI_APPLICATION = 'situatedbit.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'situatedbit_dev',
-        'USER': 'situatedbit',
-        'PASSWORD': 'garbage',
     }
 }
 
