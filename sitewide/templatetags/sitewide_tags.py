@@ -13,13 +13,13 @@ def footer_links(context):
 @register.inclusion_tag('sitewide/tags/bio.html', takes_context=True)
 def bio(context):
     return {
-        'bio': Bio.objects.all()[0],
+        'bio': Bio.objects.first(),
         'request': context['request'],
     }
 
 @register.inclusion_tag('sitewide/tags/copyright.html', takes_context=True)
 def copyright(context):
     return {
-        'copyright': Copyright.objects.all()[0],
+        'copyright': Copyright.objects.first(),
         'request': context['request'],
     }
