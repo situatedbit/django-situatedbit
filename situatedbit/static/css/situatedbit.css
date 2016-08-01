@@ -25,7 +25,7 @@ time, mark, audio, video {
 }
 /* HTML5 display-role reset for older browsers */
 article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
+footer, header, hgroup, main, menu, nav, section {
 	display: block;
 }
 body {
@@ -122,29 +122,27 @@ a:hover {
   text-decoration: underline;
 }
 
-.constrained-layout {
+#banner,
+main,
+#footer-content-wrapper {
+  margin: auto;
   max-width: 45em;
   width: 96%;
 }
 
-#content {
+#content-wrapper {
   background-color: white;
   margin: 0 auto;
 }
 
-#main {
-  margin: auto;
-}
-
-#header {
+#banner {
   background-color: white;
   border-bottom: 1px solid #dfdfdf;
   padding: 1em 0 .25em 0;
-  margin: auto;
   margin-bottom: 1.75em;
 }
 
-  #header #logo {
+  #banner #logo {
     margin-top: 0;
     margin-bottom: 0;
     font-size: 3em;
@@ -156,8 +154,8 @@ a:hover {
     background-size: auto 1em;
   }
 
-    #header a,
-    #header a:hover {
+    #banner a,
+    #banner a:hover {
       text-decoration: none;
     }
 
@@ -406,8 +404,7 @@ article {
     text-decoration: underline;
   }
 
-  .footer-wrapper {
-    margin: auto;
+  #footer-content-wrapper {
     overflow: auto;
   }
 
@@ -514,7 +511,7 @@ article {
     width: 100%;
   }
 
-  #header #logo {
+  #banner #logo {
     font-size: 2.5em;
   }
 

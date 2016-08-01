@@ -1,35 +1,60 @@
 {% load static wagtailuserbar %}
 
 <!DOCTYPE html>
-<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
-<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
-<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
-<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
-    <head>
-        <meta charset="utf-8" />
-        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-        <title>{% block title %}{% if self.seo_title %}{{ self.seo_title }}{% else %}{{ self.title }}{% endif %}{% endblock %}{% block title_suffix %}{% endblock %}</title>
-        <meta name="description" content="" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{% block title %}{% if self.seo_title %}{{ self.seo_title }}{% else %}{{ self.title }}{% endif %}{% endblock %}{% block title_suffix %}{% endblock %}</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-        {# Global stylesheets #}
-        <link rel="stylesheet" type="text/css" href="{% static 'css/situatedbit.css' %}">
+    {# Global stylesheets #}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/situatedbit.css' %}">
+    <link rel="shortcut icon" href="{% static 'css/images/favicon.ico' %}">
+    <link rel="apple-touch-icon" href="{% static 'css/images/apple-touch-icon.png' %}">
 
-        {% block extra_css %}
-            {# Override this in templates to add extra stylesheets #}
-        {% endblock %}
-    </head>
+    {% block extra_css %}
+      {# Override this in templates to add extra stylesheets #}
+    {% endblock %}
+  </head>
 
-    <body class="{% block body_class %}{% endblock %}">
-        {% wagtailuserbar %}
-
+  <body class="{% block body_class %}{% endblock %}">
+    {% wagtailuserbar %}
+    <div id="content-wrapper">
+      <header id="banner">
+        <a href="/" title="Situated Bit home"><h1 id="logo">Situated Bit</h1></a>
+      </header> <!-- #header -->
+      <main>
         {% block content %}{% endblock %}
+      </main>
+      <footer id="footer">
+        <div id="footer-content-wrapper">
+          <div class="menu-footer-container">
+            <ul id="menu-footer" class="menu">
+              <li id="menu-item-16" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-16">
+                <a title="words blog" href="http://sitbitlets.tumblr.com/">sitbitlets/words</a>
+              </li>
+            </ul>
+          </div>
+          <div id="footer-bio-wrapper">
+            <ul id="footer-bio">
+              <li>
+                <div class="textwidget">{Insert Bio Field}</div>
+              </li>
+            </ul>
+            <img id="footer-portrait" src="https://situatedbit.com/wp-content/themes/wp-theme-situatedbit/images/matt-schaefer-portrait.jpg">
+          </div>
+          <p class="copyright">&copy; Matt Schaefer</p>
+        </div>
+      </footer> <!-- #footer -->
+    </div> <!-- #content-wrapper -->
 
-        {# Global javascript #}
-        <script type="text/javascript" src="{% static 'js/situatedbit.js' %}"></script>
+    {# Global javascript #}
+    <script src="{% static 'js/situatedbit.js' %}"></script>
 
-        {% block extra_js %}
-            {# Override this in templates to add extra javascript #}
-        {% endblock %}
-    </body>
+    {% block extra_js %}
+      {# Override this in templates to add extra javascript #}
+    {% endblock %}
+  </body>
 </html>
