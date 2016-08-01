@@ -1,4 +1,5 @@
-{% load static wagtailuserbar %}
+{% load static wagtailuserbar sitewide_tags %}
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -30,22 +31,13 @@
       </main>
       <footer id="footer">
         <div id="footer-content-wrapper">
-          <div class="menu-footer-container">
-            <ul id="menu-footer" class="menu">
-              <li id="menu-item-16" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-16">
-                <a title="words blog" href="http://sitbitlets.tumblr.com/">sitbitlets/words</a>
-              </li>
-            </ul>
+          <nav>
+            {% footer_links %}
+          </nav>
+          <div class="bio">
+            {% bio %}
           </div>
-          <div id="footer-bio-wrapper">
-            <ul id="footer-bio">
-              <li>
-                <div class="textwidget">{Insert Bio Field}</div>
-              </li>
-            </ul>
-            <img id="footer-portrait" src="https://situatedbit.com/wp-content/themes/wp-theme-situatedbit/images/matt-schaefer-portrait.jpg">
-          </div>
-          <p class="copyright">&copy; Matt Schaefer</p>
+          <div class="copyright">{% copyright %}</p>
         </div>
       </footer> <!-- #footer -->
     </div> <!-- #content-wrapper -->

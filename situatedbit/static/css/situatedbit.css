@@ -408,41 +408,37 @@ article {
     overflow: auto;
   }
 
-  #footer .menu-footer-container {
+  #footer nav {
     float: left;
     width: 25%;
   }
 
-  #footer #footer-bio-wrapper {
+  #footer .bio {
     float: left;
     width: 75%;
   }
 
-    #footer #footer-bio {
-      list-style: none;
+    #footer .bio p {
       float: left;
       width: 58%;
     }
 
-      #footer #footer-bio li {
-        list-style: none;
-      }
-
-    #footer #footer-portrait {
+    #footer .bio img {
       float: right;
+      height: auto;
       width: 38%;
     }
 
-  #footer .menu {
+  #footer nav {
     overflow: auto;
   }
 
-  #footer .menu li {
+  #footer nav li {
     margin: auto;
     margin-bottom: 1.25em;
   }
 
-    #footer .menu a {
+    #footer nav a {
       width: 100%;
     }
 
@@ -458,44 +454,41 @@ article {
 } /* media query: 1024 */
 
 @media screen and (max-width: 768px) {
-
-/* there's a bug in the footer: things get squishy with the menu */
-
-  #footer .menu-footer-container {
+  #footer nav {
     float: none;
     width: 100%;
   }
 
-    #footer .menu {
+    #footer nav {
       height: 3em;
       margin: auto;
     }
 
-    #footer .menu li {
+    #footer nav li {
       float: left;
       margin-right: 3em;
     }
 
-      #footer .menu a {
+      #footer nav a {
         width: auto;
       }
 
-  #footer #footer-bio-wrapper {
+  #footer .bio {
     width: 100%;
   }
 
-  #footer #footer-bio {
+  #footer .bio p {
     width: 48%;
   }
 
-  #footer #footer-portrait {
+  #footer .bio img {
     width: 48%;
   }
 } /* media query: 768 */
 
 @media screen and (max-width: 640px) {
-  #footer .menu-footer-container,
-  #footer #footer-bio-wrapper {
+  #footer nav,
+  #footer .bio {
     width: 100%;
   }
 }
@@ -515,17 +508,17 @@ article {
     font-size: 2.5em;
   }
 
-  #footer .menu {
+  #footer nav {
     height: auto;
     overflow: auto;
   }
 
-  #footer .menu li {
+  #footer nav li {
     float: none;
     margin-right: auto;
   }
 
-    #footer .menu a {
+    #footer nav a {
       width: auto;
     }
 } /* media query: 480 */
@@ -553,11 +546,11 @@ article {
     margin-left: auto;
   }
 
-  #footer #footer-bio {
+  #footer .bio p {
     width: 100%;
   }
 
-  #footer #footer-portrait {
+  #footer .bio img {
     width: 0;
     height: 0;
   }

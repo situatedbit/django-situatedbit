@@ -1,0 +1,5 @@
+<ul>
+  {% for link in footer_links %}
+    <li><a href="{{ link.url }}" title="{{ link.title }}">{{ link.text }}</a></li>
+  {% endfor %}
+</ul>
