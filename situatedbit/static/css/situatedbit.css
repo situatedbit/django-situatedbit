@@ -72,6 +72,7 @@ table {
 
 body {
   background-color: #efefef;
+  color: #121111;
   font-family: 'sorts-mill', serif;
   font-weight: normal;
   font-style: normal;
@@ -89,6 +90,19 @@ h2,
 h3,
 h4 {
   margin-bottom: 0.5em;
+}
+
+a,
+b,
+em,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong {
+  color: black;
 }
 
 p,
@@ -115,7 +129,6 @@ img {
 
 a {
   text-decoration: none;
-  color: black;
 }
 
 a:hover {
@@ -395,6 +408,7 @@ article {
 #footer {
   background-color: #efefef;
   border-top: 1px solid #bfbfbf;
+  color: black;
   padding-top: .5em;
   margin-top: .5em;
   width: 100%;
