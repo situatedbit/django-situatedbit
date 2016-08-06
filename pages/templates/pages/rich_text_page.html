@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags %}
+
+{% block content %}
+<article>
+    <h1><a href="{{ page.url }}" title="Permalink for {{ page.title }}" rel="bookmark">{{ page.title }}</a></h1>
+  {{ page.body|richtext }}
+</article>
+{% endblock %}
