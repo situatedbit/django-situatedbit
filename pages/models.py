@@ -15,3 +15,10 @@ class RichTextPage(Page):
     content_panels = Page.content_panels + [
         FieldPanel('body', classname="full"),
     ]
+
+    def get_context(self, request, *args, **kwargs):
+        context = super(RichTextPage, self).get_context(request, *args, **kwargs)
+
+        context['parent'] = self.get_parent()
+
+        return context
