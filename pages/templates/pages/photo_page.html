@@ -1,15 +1,7 @@
-{% extends "base.html" %}
+{% extends "pages/page.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
-{% block content %}
-<article>
-  <header>
-    <h1><a href="{{ page.url }}" title="Permalink for {{ page.title }}" rel="bookmark">{{ page.title }}</a></h1>
-    <nav>
-      <a href="{{ page.url }}" title="Permalink for {{ page.title }}" rel="bookmark"><time datetime="{{ page.first_published_at|date:"c" }}" pubdate>{{ page.first_published_at|date:"Y-m-d" }}</time></a> ·
-      <a href="{{ parent.url }}">{{ parent.url }}</a>
-    </nav>
-  </header>
+{% block article_content %}
   {{ page.body|richtext }}
 
   {% for photo in page.photos %}
@@ -24,6 +16,4 @@
       <figcaption>{{ photo.caption|richtext }}</figcaption>
     </figure>
   {% endfor %}
-  <footer></footer>
-</article>
 {% endblock %}
