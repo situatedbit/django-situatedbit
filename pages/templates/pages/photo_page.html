@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags %}
+{% load wagtailcore_tags wagtailimages_tags %}
 
 {% block content %}
 <article>
@@ -11,6 +11,19 @@
     </nav>
   </header>
   {{ page.body|richtext }}
+
+  {% for photo in page.photos %}
+    <figure>
+      <a href="{{ photo.image.file.url }}">
+        {% if photo.image.is_horizontal %}
+          {% image photo.image original class="horizontal" %}
+        {% else %}
+          {% image photo.image original class="vertical" %}
+        {% endif %}
+      </a>
+      <figcaption>{{ photo.caption|richtext }}</figcaption>
+    </figure>
+  {% endfor %}
   <footer></footer>
 </article>
 {% endblock %}
