@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.html import strip_tags
 from modelcluster.fields import ParentalKey
 from os.path import basename
 from wagtail.wagtailadmin.edit_handlers import FieldPanel, InlinePanel
@@ -63,9 +64,28 @@ class RichTextPage(Page):
         return context
 
 class PhotoPage(RichTextPage):
+    preview_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
     content_panels = RichTextPage.content_panels + [
         InlinePanel('photo_placements', label="Photos"),
     ]
+
+    promote_panels = RichTextPage.promote_panels + [
+        ImageChooserPanel('preview_image'),
+    ]
+
+    def preview_text(self):
+        max_length = 140
+        body = strip_tags(self.body)
+        body_text = body if len(body) <= max_length else body[:max_length] + "…"
+
+        return self.search_description or body_text
 
     def photos(self):
         return map(lambda p: p.photo, self.photo_placements.all())
