@@ -10,8 +10,40 @@ from wagtail.wagtailsearch import index
 from wagtail.wagtailsnippets.edit_handlers import SnippetChooserPanel
 from wagtail.wagtailsnippets.models import register_snippet
 
+class PreviewPresenter:
+    def __init__(self, page):
+        self.page = page
+
+    def date(self):
+        return self.page.first_published_at
+
+    def has_thumbnail_class(self):
+        return 'has-thumbnail' if self.page.preview_image else ''
+
+    def text(self):
+        return self.page.preview_text()
+
+    def image(self):
+        return self.page.preview_image
+
+    def title(self):
+        return self.page.title
+
+    def url(self):
+        return self.page.url
+
+class PhotoPresenter:
+    def orientation_class(self):
+        return 'horizontal' if self.image.width >= self.image.height else 'vertical'
+
+class PhotoIndexPage(Page):
+    subpage_types = ['pages.PhotoPage']
+
+    def subpage_presenters(self):
+        return map(lambda p: PreviewPresenter(p), PhotoPage.by_publish_date().descendant_of(self).live())
+
 @register_snippet
-class Photo(models.Model):
+class Photo(models.Model, PhotoPresenter):
     caption = RichTextField()
     image = models.ForeignKey(
         'wagtailimages.Image',
@@ -89,3 +121,6 @@ class PhotoPage(RichTextPage):
 
     def photos(self):
         return map(lambda p: p.photo, self.photo_placements.all())
+
+    def by_publish_date():
+        return PhotoPage.objects.order_by('-first_published_at')

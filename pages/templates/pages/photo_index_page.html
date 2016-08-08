@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load wagtailcore_tags wagtailimages_tags page_headings_tags %}
+
+{% block content %}
+{% for page in page.subpage_presenters %}
+  <article class="preview {{ page.has_thumbnail_class }}">
+    <header>
+      <h1><a href="{{ page.url }}">{{ page.title }}</a></h1>
+      <nav>
+        <a href="{{ page.url }}" title="{{ page.title }}">{% pub_time page.date %}</a>
+      </nav>
+    </header>
+    <a class="thumbnail" href="{{ page.url }}">{% image page.image width-300 %}</a>
+    <p class="excerpt"><a href="{{ page.url }}">{{ page.text }}</a></p>
+    <footer></footer>
+  </article>
+{% endfor %}
+{% endblock %}

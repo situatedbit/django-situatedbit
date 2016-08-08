@@ -1,4 +1,4 @@
-{% extends "pages/page.html" %}
+{% extends "pages/single_article_page.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
 {% block article_content %}
@@ -7,11 +7,8 @@
   {% for photo in page.photos %}
     <figure>
       <a href="{{ photo.image.file.url }}">
-        {% if photo.image.is_horizontal %}
-          {% image photo.image original class="horizontal" %}
-        {% else %}
-          {% image photo.image original class="vertical" %}
-        {% endif %}
+        {% image photo.image original as p %}
+        <img src="{{ p.url }}" width="{{ p.width }}" height="{{ p.height }}" alt="{{ p.alt }}" class="{{ photo.orientation_class }}" />
       </a>
       <figcaption>{{ photo.caption|richtext }}</figcaption>
     </figure>
