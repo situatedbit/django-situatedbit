@@ -43,7 +43,7 @@ class HomePage(IndexPage):
     template = 'pages/index_page.html'
 
     class Meta:
-        verbose_name = "SB Home Page"
+        verbose_name = "Home Page"
 
     def previews(self):
         pages = AbstractBasePage.objects.descendant_of(self).not_type(IndexPage).order_by('-first_published_at').live()
