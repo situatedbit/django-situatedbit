@@ -10,7 +10,49 @@ from wagtail.wagtailsearch import index
 from wagtail.wagtailsnippets.edit_handlers import SnippetChooserPanel
 from wagtail.wagtailsnippets.models import register_snippet
 
-class PreviewPresenter:
+class AbstractBasePage(Page):
+    in_home_stream = models.BooleanField(default=True, blank=False, verbose_name="Include in Homepage Stream")
+    preview_image = models.ForeignKey(
+        'wagtailimages.Image',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
+    def preview_text(self):
+        return self.search_description
+
+    is_abstract = True
+
+    class Meta:
+        abstract = True
+
+    content_panels = Page.content_panels
+    promote_panels = Page.promote_panels + [
+        FieldPanel('in_home_stream'),
+        ImageChooserPanel('preview_image'),
+    ]
+    search_fields = Page.search_fields
+
+class IndexPage(AbstractBasePage):
+    def previews(self):
+        return map(lambda p: Preview(p.specific), self.get_children().order_by('-first_published_at').live())
+
+class HomePage(IndexPage):
+    template = 'pages/index_page.html'
+
+    class Meta:
+        verbose_name = "SB Home Page"
+
+    def previews(self):
+        pages = AbstractBasePage.objects.descendant_of(self).not_type(IndexPage).order_by('-first_published_at').live()
+        # it would be better to include this in the original query, but we can't
+        pages_for_home_page = filter(lambda p: p.specific.in_home_stream, pages)
+
+        return map(lambda p: Preview(p.specific), pages_for_home_page)
+
+class Preview:
     def __init__(self, page):
         self.page = page
 
@@ -36,11 +78,13 @@ class PhotoPresenter:
     def orientation_class(self):
         return 'horizontal' if self.image.width >= self.image.height else 'vertical'
 
-class PhotoIndexPage(Page):
+class PhotoIndexPage(AbstractBasePage):
     subpage_types = ['pages.PhotoPage']
 
-    def subpage_presenters(self):
-        return map(lambda p: PreviewPresenter(p), PhotoPage.by_publish_date().descendant_of(self).live())
+    template = 'pages/index_page.html'
+
+    def previews(self):
+        return map(lambda p: Preview(p), PhotoPage.by_publish_date().descendant_of(self).live())
 
 @register_snippet
 class Photo(models.Model, PhotoPresenter):
@@ -77,14 +121,14 @@ class PhotoPlacement(Orderable, models.Model):
     def __str__(self):
         return self.page.title + " -> " + self.photo
 
-class RichTextPage(Page):
+class RichTextPage(AbstractBasePage):
     body = RichTextField()
 
-    search_fields = Page.search_fields + [
+    search_fields = AbstractBasePage.search_fields + [
         index.SearchField('body'),
     ]
 
-    content_panels = Page.content_panels + [
+    content_panels = AbstractBasePage.content_panels + [
         FieldPanel('body', classname="full"),
     ]
 
@@ -95,29 +139,17 @@ class RichTextPage(Page):
 
         return context
 
-class PhotoPage(RichTextPage):
-    preview_image = models.ForeignKey(
-        'wagtailimages.Image',
-        null=True,
-        blank=True,
-        on_delete=models.SET_NULL,
-        related_name='+'
-    )
-
-    content_panels = RichTextPage.content_panels + [
-        InlinePanel('photo_placements', label="Photos"),
-    ]
-
-    promote_panels = RichTextPage.promote_panels + [
-        ImageChooserPanel('preview_image'),
-    ]
-
     def preview_text(self):
         max_length = 140
         body = strip_tags(self.body)
         body_text = body if len(body) <= max_length else body[:max_length] + "…"
 
         return self.search_description or body_text
+
+class PhotoPage(RichTextPage):
+    content_panels = RichTextPage.content_panels + [
+        InlinePanel('photo_placements', label="Photos"),
+    ]
 
     def photos(self):
         return map(lambda p: p.photo, self.photo_placements.all())

@@ -2,7 +2,7 @@
 {% load wagtailcore_tags wagtailimages_tags page_headings_tags %}
 
 {% block content %}
-{% for page in page.subpage_presenters %}
+{% for page in page.previews %}
   <article class="preview {{ page.has_thumbnail_class }}">
     <header>
       <h1><a href="{{ page.url }}">{{ page.title }}</a></h1>
