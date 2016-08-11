@@ -1,18 +1,24 @@
 {% extends "base.html" %}
-{% load wagtailcore_tags wagtailimages_tags page_headings_tags %}
+{% load wagtailcore_tags wagtailimages_tags page_headings_tags pagination_tags %}
 
 {% block content %}
-{% for page in page.previews %}
-  <article class="preview {{ page.has_thumbnail_class }}">
+  <nav>
+    {% paginate_previous pages %}
+  </nav>
+{% for preview in pages.previews %}
+  <article class="preview {{ preview.has_thumbnail_class }}">
     <header>
-      <h1><a href="{{ page.url }}">{{ page.title }}</a></h1>
+      <h1><a href="{{ preview.url }}">{{ preview.title }}</a></h1>
       <nav>
-        <a href="{{ page.url }}" title="{{ page.title }}">{% pub_time page.date %}</a>
+        <a href="{{ preview.url }}" title="{{ preview.title }}">{% pub_time preview.date %}</a>
       </nav>
     </header>
-    <a class="thumbnail" href="{{ page.url }}">{% image page.image width-300 %}</a>
-    <p class="excerpt"><a href="{{ page.url }}">{{ page.text }}</a></p>
+    <a class="thumbnail" href="{{ preview.url }}">{% image preview.image width-300 %}</a>
+    <p class="excerpt"><a href="{{ preview.url }}">{{ preview.text }}</a></p>
     <footer></footer>
   </article>
 {% endfor %}
+  <nav>
+    {% paginate_next pages %}
+  </nav>
 {% endblock %}
