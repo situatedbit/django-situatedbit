@@ -4,14 +4,13 @@ from modelcluster.fields import ParentalKey
 from os.path import basename
 from wagtail.wagtailadmin.edit_handlers import FieldPanel, InlinePanel
 from wagtail.wagtailcore.fields import RichTextField
-from wagtail.wagtailcore.models import Page, Orderable
+from wagtail.wagtailcore.models import Page, Orderable, PageManager, PageQuerySet
 from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 from wagtail.wagtailsearch import index
 from wagtail.wagtailsnippets.edit_handlers import SnippetChooserPanel
 from wagtail.wagtailsnippets.models import register_snippet
 
-class AbstractBasePage(Page):
-    in_home_stream = models.BooleanField(default=True, blank=False, verbose_name="Include in Homepage Stream")
+class BasePage(Page):
     preview_image = models.ForeignKey(
         'wagtailimages.Image',
         null=True,
@@ -23,34 +22,97 @@ class AbstractBasePage(Page):
     def preview_text(self):
         return self.search_description
 
-    is_abstract = True
-
-    class Meta:
-        abstract = True
-
-    content_panels = Page.content_panels
     promote_panels = Page.promote_panels + [
-        FieldPanel('in_home_stream'),
         ImageChooserPanel('preview_image'),
     ]
-    search_fields = Page.search_fields
 
-class IndexPage(AbstractBasePage):
-    def previews(self):
-        return map(lambda p: Preview(p.specific), self.get_children().order_by('-first_published_at').live())
+class Pagination:
+    pagination_param = 'p'
+
+    # requires previews_query, previews_per_page, previews
+
+    def pages(self, page_request):
+        request = Pagination.Request(page_request, self.previews_query(), self.previews_per_page, Pagination.pagination_param)
+
+        return {
+            'next_page': request.next_page(),
+            'previous_page': request.previous_page(),
+            'previews': self.previews(self.previews_query()) #[request.query_min(), request.query_max()])
+        }
+
+    class Request:
+        def __init__(self, request, query, previews_per_page, param):
+            self.request = request
+            self.query = query
+            self.previews_per_page = previews_per_page
+            self.param = param
+
+        def current_page(self):
+            page_arg = int(self.request.GET.get(self.param, 1))
+            return min(self.pages_count(), max(1, page_arg))
+
+        def next_page(self):
+            current_page = self.current_page()
+            return {'url': self.paginated_url(current_page + 1)} if current_page < self.pages_count() else None
+
+        def pages_count(self):
+            self._pages_count = self.query.count()
+            return self._pages_count
+
+        def paginated_url(self, page):
+            return "?{0}={1}".format(self.param, page)
+
+        def previous_page(self):
+            current_page = self.current_page()
+            return {'url': self.paginated_url(current_page - 1) } if current_page > 1 else None
+
+        def query_min(self):
+            return (self.current_page() - 1) * self.previews_per_page
+
+        def query_max(self):
+            return self.query_min() + self.previews_per_page
+
+class IndexPage(BasePage, Pagination):
+    previews_per_page = models.IntegerField(default=5, blank=False)
+
+    def get_context(self, request):
+        context = super(IndexPage, self).get_context(request)
+        context['pages'] = self.pages(request)
+        return context
+
+    def previews_query(self):
+        return self.get_children().order_by('-first_published_at').live()
+
+    def previews(self, query):
+        return map(lambda p: Preview(p.specific), query)
 
 class HomePage(IndexPage):
+    stream = models.ForeignKey(
+        'pages.Stream',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='+'
+    )
+
+    content_panels = IndexPage.content_panels + [
+        SnippetChooserPanel('stream'),
+    ]
+
     template = 'pages/index_page.html'
 
     class Meta:
         verbose_name = "Home Page"
 
-    def previews(self):
-        pages = AbstractBasePage.objects.descendant_of(self).not_type(IndexPage).order_by('-first_published_at').live()
+    def previews_query(self):
         # it would be better to include this in the original query, but we can't
-        pages_for_home_page = filter(lambda p: p.specific.in_home_stream, pages)
-
-        return map(lambda p: Preview(p.specific), pages_for_home_page)
+        #if self.stream:
+            #return BasePage.objects.order_by('-first_published_at').live().filter(stream=self.stream)
+        #else:
+        return BasePage.objects.order_by('-first_published_at').live()
+        #end
+#        return  BasePage.objects.descendant_of(self).not_type(IndexPage).order_by('-first_published_at').in_home_stream().live()
+#        return filter(lambda p: p.specific.in_home_stream, query_set)
 
 class Preview:
     def __init__(self, page):
@@ -78,13 +140,16 @@ class PhotoPresenter:
     def orientation_class(self):
         return 'horizontal' if self.image.width >= self.image.height else 'vertical'
 
-class PhotoIndexPage(AbstractBasePage):
+class PhotoIndexPage(IndexPage):
     subpage_types = ['pages.PhotoPage']
 
-    template = 'pages/index_page.html'
+    template = IndexPage.template
 
-    def previews(self):
-        return map(lambda p: Preview(p), PhotoPage.by_publish_date().descendant_of(self).live())
+    def previews_query(self):
+        return PhotoPage.by_publish_date().descendant_of(self).live()
+
+    def previews(self, query):
+        return map(lambda p: Preview(p), query)
 
 @register_snippet
 class Photo(models.Model, PhotoPresenter):
@@ -105,6 +170,28 @@ class Photo(models.Model, PhotoPresenter):
     def __str__(self):
         return "{0} ({1})".format(self.image.title, basename(self.image.file.name))
 
+@register_snippet
+class Stream(models.Model):
+    name = models.CharField(blank=False,max_length=255)
+
+    panels = [
+        FieldPanel('name', classname="full"),
+    ]
+
+    def __str__(self):
+        return self.name + " Stream"
+
+class StreamInclusion(models.Model):
+    page = ParentalKey(Page, related_name='streams')
+    stream = models.ForeignKey('pages.Stream', related_name='+')
+
+    panels = [
+        SnippetChooserPanel('stream'),
+    ]
+
+    def __str__(self):
+        return "{0} <-> {1}".format(self.stream, self.page.title)
+
 class PhotoPlacement(Orderable, models.Model):
     page = ParentalKey('pages.PhotoPage', related_name='photo_placements')
     photo = models.ForeignKey('pages.Photo', related_name='+')
@@ -121,14 +208,14 @@ class PhotoPlacement(Orderable, models.Model):
     def __str__(self):
         return self.page.title + " -> " + self.photo
 
-class RichTextPage(AbstractBasePage):
+class RichTextPage(BasePage):
     body = RichTextField()
 
-    search_fields = AbstractBasePage.search_fields + [
+    search_fields = BasePage.search_fields + [
         index.SearchField('body'),
     ]
 
-    content_panels = AbstractBasePage.content_panels + [
+    content_panels = BasePage.content_panels + [
         FieldPanel('body', classname="full"),
     ]
 
